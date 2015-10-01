@@ -1,0 +1,12 @@
+source 'https://github.com/CocoaPods/Specs.git'
+use_frameworks!
+
+target 'FFSideMenu_Example', :exclusive => true do
+  pod "FFSideMenu", :path => "../"
+end
+
+target 'FFSideMenu_Tests', :exclusive => true do
+  pod "FFSideMenu", :path => "../"
+
+  pod 'FBSnapshotTestCase'
+end

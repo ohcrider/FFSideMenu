@@ -1,0 +1,6 @@
+framework module FFSideMenu {
+  umbrella header "FFSideMenu-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,6 @@
+framework module Pods_FFSideMenu_Tests {
+  umbrella header "Pods-FFSideMenu_Tests-umbrella.h"
+
+  export *
+  module * { export * }
+}

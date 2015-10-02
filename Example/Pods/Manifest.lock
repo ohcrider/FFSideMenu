@@ -1,0 +1,30 @@
+PODS:
+  - FBSnapshotTestCase (2.0.4):
+    - FBSnapshotTestCase/SwiftSupport (= 2.0.4)
+  - FBSnapshotTestCase/Core (2.0.4)
+  - FBSnapshotTestCase/SwiftSupport (2.0.4):
+    - FBSnapshotTestCase/Core
+  - FFSideMenu (0.1.0)
+
+DEPENDENCIES:
+  - FBSnapshotTestCase (from `git@github.com:facebook/ios-snapshot-test-case.git`,
+    branch `master`)
+  - FFSideMenu (from `../`)
+
+EXTERNAL SOURCES:
+  FBSnapshotTestCase:
+    :branch: master
+    :git: git@github.com:facebook/ios-snapshot-test-case.git
+  FFSideMenu:
+    :path: "../"
+
+CHECKOUT OPTIONS:
+  FBSnapshotTestCase:
+    :commit: 40d412691b8d296644f1fb9e0fb15b46ee531871
+    :git: git@github.com:facebook/ios-snapshot-test-case.git
+
+SPEC CHECKSUMS:
+  FBSnapshotTestCase: 6c9fe22920e7bc8a98b6b3703ba24cd5ba0978ce
+  FFSideMenu: a03513380d3b4e3611bc3b8490dca7081968b5f1
+
+COCOAPODS: 0.38.2

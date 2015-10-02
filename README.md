@@ -5,11 +5,15 @@
 [![License](https://img.shields.io/cocoapods/l/FFSideMenu.svg?style=flat)](http://cocoapods.org/pods/FFSideMenu)
 [![Platform](https://img.shields.io/cocoapods/p/FFSideMenu.svg?style=flat)](http://cocoapods.org/pods/FFSideMenu)
 
-## Usage
+## About
+The simple way to custom side menu with navigation bar.
 
+## Demo
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
+![demo](https://c2.staticflickr.com/6/5645/21668838170_f028dfac61_o.gif)
 
-## Requirements
+## Features
+more powerful and code is more easy to understand.
 
 ## Installation
 

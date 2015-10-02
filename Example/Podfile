@@ -8,5 +8,5 @@ end
 target 'FFSideMenu_Tests', :exclusive => true do
   pod "FFSideMenu", :path => "../"
 
-  pod 'FBSnapshotTestCase'
+  pod 'FBSnapshotTestCase', :git => 'git@github.com:facebook/ios-snapshot-test-case.git', :branch => 'master'
 end

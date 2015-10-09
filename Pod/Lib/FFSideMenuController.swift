@@ -14,7 +14,7 @@ public enum FFSideMenuType: Int {
     case Both
 }
 
-public class FFSideMenuController: UIViewController {
+public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate {
 
     // MARK: - Variable
 
@@ -59,67 +59,70 @@ public class FFSideMenuController: UIViewController {
     // MARK: - FFSideMenu core method
 
     public func setupMenu(leftMenuViewController: UIViewController?,
-                            rightMenuViewController: UIViewController?,
-                            leftMenuWidh: CGFloat?,
-                            rightMenuWidh: CGFloat?,
-                            enableTap: Bool,
-                            enablePan: Bool) {
-        var menuType: FFSideMenuType?
+        rightMenuViewController: UIViewController?,
+        leftMenuWidh: CGFloat?,
+        rightMenuWidh: CGFloat?,
+        enableTap: Bool,
+        enablePan: Bool) {
+            var menuType: FFSideMenuType?
 
-        if (leftMenuViewController != nil && rightMenuViewController == nil) {
-            menuType = .Left
-        } else if (leftMenuViewController == nil && rightMenuViewController != nil) {
-            menuType = .Right
-        } else if (leftMenuViewController != nil && rightMenuViewController != nil) {
-            menuType = .Both
-        }
-
-        if let mt = menuType {
-            switch mt {
-            case .Left:
-                setupLeftMenu(leftMenuViewController!)
-            case .Right:
-                setupRightmenu(rightMenuViewController!)
-            case .Both:
-                setupLeftMenu(leftMenuViewController!)
-                setupRightmenu(rightMenuViewController!)
+            if (leftMenuViewController != nil && rightMenuViewController == nil) {
+                menuType = .Left
+            } else if (leftMenuViewController == nil && rightMenuViewController != nil) {
+                menuType = .Right
+            } else if (leftMenuViewController != nil && rightMenuViewController != nil) {
+                menuType = .Both
             }
-        }
 
-        if let lw = leftMenuWidh {
-            self.leftMenuWidh = lw
-        }
+            if let mt = menuType {
+                switch mt {
+                case .Left:
+                    setupLeftMenu(leftMenuViewController!)
+                case .Right:
+                    setupRightmenu(rightMenuViewController!)
+                case .Both:
+                    setupLeftMenu(leftMenuViewController!)
+                    setupRightmenu(rightMenuViewController!)
+                }
+            }
 
-        if let rw = rightMenuWidh {
-            self.rightMenuWidh = rw
-        }
+            if let lw = leftMenuWidh {
+                self.leftMenuWidh = lw
+            }
 
-        if (enablePan) {
-            let panLeftMenu = UIPanGestureRecognizer(target: self, action: "panLeftMenu:")
-            leftMenuView!.addGestureRecognizer(panLeftMenu)
+            if let rw = rightMenuWidh {
+                self.rightMenuWidh = rw
+            }
 
-            let panRightMenu = UIPanGestureRecognizer(target: self, action: "panRightMenu:")
-            rightMenuView!.addGestureRecognizer(panRightMenu)
+            if (enablePan) {
+                let panLeftMenu = UIPanGestureRecognizer(target: self, action: "panLeftMenu:")
+                panLeftMenu.delegate = self
+                leftMenuView!.addGestureRecognizer(panLeftMenu)
 
-            let panLeftScreen = UIScreenEdgePanGestureRecognizer(target: self, action: "panLeftScreen:")
-            panLeftScreen.edges = .Left
-            view.addGestureRecognizer(panLeftScreen)
+                let panRightMenu = UIPanGestureRecognizer(target: self, action: "panRightMenu:")
+                panRightMenu.delegate = self
+                rightMenuView!.addGestureRecognizer(panRightMenu)
 
-            let panRightScreen = UIScreenEdgePanGestureRecognizer(target: self, action: "panRightScreen:")
-            panRightScreen.edges = .Right
-            view.addGestureRecognizer(panRightScreen)
-        }
+                let panLeftScreen = UIScreenEdgePanGestureRecognizer(target: self, action: "panLeftScreen:")
+                panLeftScreen.edges = .Left
+                view.addGestureRecognizer(panLeftScreen)
 
-        if (enableTap) {
-            let tap = UITapGestureRecognizer(target: self, action: "tap:")
-            self.view.addGestureRecognizer(tap)
-        }
+                let panRightScreen = UIScreenEdgePanGestureRecognizer(target: self, action: "panRightScreen:")
+                panRightScreen.edges = .Right
+                view.addGestureRecognizer(panRightScreen)
+            }
+
+            if (enableTap) {
+                let tap = UITapGestureRecognizer(target: self, action: "tap:")
+                self.view.addGestureRecognizer(tap)
+            }
     }
 
     func setupLeftMenu(viewController: UIViewController?) {
         self.addChildViewController(viewController!)
         viewController!.view.frame = CGRectMake(CGFloat(0), CGFloat(0), leftMenuWidh, screenHeight)
         self.view.addSubview(viewController!.view)
+        viewController?.didMoveToParentViewController(self)
 
         leftMenuView = viewController?.view
     }
@@ -128,6 +131,7 @@ public class FFSideMenuController: UIViewController {
         self.addChildViewController(viewController!)
         viewController!.view.frame = CGRectMake(screenWidth - rightMenuWidh, CGFloat(0), rightMenuWidh, screenHeight)
         self.view.addSubview(viewController!.view)
+        viewController?.didMoveToParentViewController(self)
 
         rightMenuView = viewController?.view
     }
@@ -322,5 +326,11 @@ public class FFSideMenuController: UIViewController {
                 }
             }
         }
+    }
+    
+    // MARK: - Gesture delegate
+    public func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        let translation = (gestureRecognizer as! UIPanGestureRecognizer).translationInView(gestureRecognizer.view!.superview)
+        return abs(translation.x) > abs(translation.y)
     }
 }

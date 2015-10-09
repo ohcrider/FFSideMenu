@@ -63,7 +63,7 @@ public class FFSideMenuController: UIViewController {
                             leftMenuWidh: CGFloat?,
                             rightMenuWidh: CGFloat?,
                             enableTap: Bool,
-                            enableSwipe: Bool) {
+                            enablePan: Bool) {
         var menuType: FFSideMenuType?
 
         if (leftMenuViewController != nil && rightMenuViewController == nil) {
@@ -94,14 +94,20 @@ public class FFSideMenuController: UIViewController {
             self.rightMenuWidh = rw
         }
 
-        if (enableSwipe) {
-            let swipeRight = UISwipeGestureRecognizer(target: self, action: "swipe:")
-            swipeRight.direction = UISwipeGestureRecognizerDirection.Right
-            self.view.addGestureRecognizer(swipeRight)
+        if (enablePan) {
+            let panLeftMenu = UIPanGestureRecognizer(target: self, action: "panLeftMenu:")
+            leftMenuView!.addGestureRecognizer(panLeftMenu)
 
-            let swipeLeft = UISwipeGestureRecognizer(target: self, action: "swipe:")
-            swipeLeft.direction = UISwipeGestureRecognizerDirection.Left
-            self.view.addGestureRecognizer(swipeLeft)
+            let panRightMenu = UIPanGestureRecognizer(target: self, action: "panRightMenu:")
+            rightMenuView!.addGestureRecognizer(panRightMenu)
+
+            let panLeftScreen = UIScreenEdgePanGestureRecognizer(target: self, action: "panLeftScreen:")
+            panLeftScreen.edges = .Left
+            view.addGestureRecognizer(panLeftScreen)
+
+            let panRightScreen = UIScreenEdgePanGestureRecognizer(target: self, action: "panRightScreen:")
+            panRightScreen.edges = .Right
+            view.addGestureRecognizer(panRightScreen)
         }
 
         if (enableTap) {
@@ -190,27 +196,130 @@ public class FFSideMenuController: UIViewController {
         }
     }
 
-    func swipe(gesture: UIGestureRecognizer) {
-        if let swipeGesture = gesture as? UISwipeGestureRecognizer {
-            switch swipeGesture.direction {
-            case UISwipeGestureRecognizerDirection.Right:
-                if (!isLeftMenuOpen && !isRightMenuOpen) {
-                     toggleLeftMenu()
-                }
+    func panLeftMenu(gesture: UIGestureRecognizer) {
+        if let panGesture = gesture as? UIPanGestureRecognizer {
+            let translation = panGesture.translationInView(panGesture.view!)
 
-                if (isRightMenuOpen) {
-                    toggleRightMenu()
-                }
-            case UISwipeGestureRecognizerDirection.Left:
-                if (!isLeftMenuOpen && !isRightMenuOpen) {
-                    toggleRightMenu()
-                }
+            if (isLeftMenuOpen) {
+                let width = leftMenuWidh + translation.x
 
-                if (isLeftMenuOpen) {
-                    toggleLeftMenu()
+                if (width > 0 && width < leftMenuWidh) {
+                    panGesture.view!.frame.size.width = width
                 }
-            default:
-                break
+            }
+
+            if (panGesture.state == UIGestureRecognizerState.Ended) {
+                let duration = leftMenuAnimationDuration / 2
+
+                if (panGesture.view!.frame.size.width < leftMenuWidh / 2) {
+                    UIView.animateWithDuration(duration, animations: { () -> Void in
+                        panGesture.view!.frame.size.width = 0
+                        }, completion: { (Bool) -> Void in
+                            self.isLeftMenuOpen = false
+                    })
+                } else {
+                    UIView.animateWithDuration(duration, animations: { () -> Void in
+                        panGesture.view!.frame.size.width = self.leftMenuWidh
+                        }, completion: { (Bool) -> Void in
+                            self.isLeftMenuOpen = true
+                    })
+                }
+            }
+        }
+    }
+
+    func panRightMenu(gesture: UIGestureRecognizer) {
+        if let panGesture = gesture as? UIPanGestureRecognizer {
+            let translation = panGesture.translationInView(panGesture.view!)
+
+            if (isRightMenuOpen) {
+                let originX = screenWidth - rightMenuWidh + translation.x
+
+                if (originX > screenWidth - rightMenuWidh && originX < screenWidth) {
+                    panGesture.view!.frame.origin.x = originX
+                }
+            }
+
+            if (panGesture.state == UIGestureRecognizerState.Ended) {
+                let duration = rightMenuAnimationDuration / 2
+
+                if (panGesture.view!.frame.origin.x > (self.screenWidth - self.rightMenuWidh) + rightMenuWidh / 2) {
+                    UIView.animateWithDuration(duration, animations: { () -> Void in
+                        panGesture.view!.frame.origin.x = self.screenWidth
+                        }, completion: { (Bool) -> Void in
+                            self.isRightMenuOpen = false
+                    })
+                } else {
+                    UIView.animateWithDuration(duration, animations: { () -> Void in
+                        panGesture.view!.frame.origin.x = self.screenWidth - self.rightMenuWidh
+                        }, completion: { (Bool) -> Void in
+                            self.isRightMenuOpen = true
+                    })
+                }
+            }
+        }
+    }
+
+    func panLeftScreen(gesture: UIGestureRecognizer) {
+        if let panGesture = gesture as? UIScreenEdgePanGestureRecognizer {
+            let translation = panGesture.translationInView(panGesture.view!)
+
+            if (!isLeftMenuOpen && !isRightMenuOpen) {
+                let width = translation.x
+
+                if (width > 0 && width < leftMenuWidh) {
+                    leftMenuView?.frame.size.width = width
+                }
+            }
+
+            if (panGesture.state == UIGestureRecognizerState.Ended) {
+                let duration = leftMenuAnimationDuration / 2
+
+                if (self.leftMenuView?.frame.size.width < leftMenuWidh / 2) {
+                    UIView.animateWithDuration(duration, animations: { () -> Void in
+                        self.leftMenuView?.frame.size.width = 0
+                        }, completion: { (Bool) -> Void in
+                            self.isLeftMenuOpen = false
+                    })
+                } else {
+                    UIView.animateWithDuration(duration, animations: { () -> Void in
+                        self.leftMenuView?.frame.size.width = self.leftMenuWidh
+                        }, completion: { (Bool) -> Void in
+                            self.isLeftMenuOpen = true
+                    })
+                }
+            }
+        }
+    }
+
+    func panRightScreen(gesture: UIGestureRecognizer) {
+        if let panGesture = gesture as? UIScreenEdgePanGestureRecognizer {
+            let translation = panGesture.translationInView(panGesture.view!)
+
+            if (!isLeftMenuOpen && !isRightMenuOpen) {
+                let originX = screenWidth + translation.x
+
+                if (originX > screenWidth - rightMenuWidh && originX < screenWidth) {
+                    self.rightMenuView!.frame.origin.x = originX
+                }
+            }
+
+            if (panGesture.state == UIGestureRecognizerState.Ended) {
+                let duration = rightMenuAnimationDuration / 2
+
+                if (self.rightMenuView!.frame.origin.x > (self.screenWidth - self.rightMenuWidh) + rightMenuWidh / 2) {
+                    UIView.animateWithDuration(duration, animations: { () -> Void in
+                        self.rightMenuView!.frame.origin.x = self.screenWidth
+                        }, completion: { (Bool) -> Void in
+                            self.isRightMenuOpen = false
+                    })
+                } else {
+                    UIView.animateWithDuration(duration, animations: { () -> Void in
+                        self.rightMenuView!.frame.origin.x = self.screenWidth - self.rightMenuWidh
+                        }, completion: { (Bool) -> Void in
+                            self.isRightMenuOpen = true
+                    })
+                }
             }
         }
     }

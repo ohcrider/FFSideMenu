@@ -30,7 +30,7 @@ class ViewController: FFSideMenuController {
                     leftMenuWidh: nil,
                     rightMenuWidh: nil,
                     enableTap: true,
-                    enableSwipe: true)
+                    enablePan: true)
     }
 
     override func didReceiveMemoryWarning() {

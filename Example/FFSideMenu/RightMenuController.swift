@@ -8,10 +8,27 @@
 
 import UIKit
 
-class RightMenuController: UITableViewController {
+class RightMenuController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    @IBOutlet weak var tableView: UITableView!
+
+    var items = [
+        [
+            "identifier": "testOne",
+            "text": "right test one"
+        ],
+        [
+            "identifier": "testTwo",
+            "text": "right test two"
+        ]
+
+    ]
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -30,25 +47,28 @@ class RightMenuController: UITableViewController {
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return items.count
     }
 
-    /*
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("reuseIdentifier", forIndexPath: indexPath)
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier(items[indexPath.row]["identifier"]!, forIndexPath: indexPath)
 
         // Configure the cell...
+        cell.textLabel?.text = items[indexPath.row]["text"]
+        cell.backgroundColor = tableView.backgroundColor
 
+        let selectedBackgroundView = UIView()
+        selectedBackgroundView.backgroundColor = UIColor.yellowColor()
+        cell.selectedBackgroundView = selectedBackgroundView
         return cell
     }
-    */
 
     /*
     // Override to support conditional editing of the table view.

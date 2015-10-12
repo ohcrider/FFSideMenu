@@ -8,16 +8,62 @@
 
 import UIKit
 
-public enum FFSideMenuType: Int {
-    case Left
-    case Right
-    case Both
+// MARK: - SegueIdentifier
+let FFLeftSegueIdentifier = "ff_left"
+let FFRightSegueIdentifier = "ff_right"
+
+// MARK: - Screen Size
+let screenWidth = UIScreen.mainScreen().bounds.size.width
+let screenHeight = UIScreen.mainScreen().bounds.size.height
+
+// MARK: - Custom UIStoryboardSegue
+public class FFSideMenuSetMenuSegue: UIStoryboardSegue {
+
+    override public func perform() {
+        switch self.identifier {
+            case FFLeftSegueIdentifier?, FFRightSegueIdentifier?:
+                let firstVC = self.sourceViewController as! FFSideMenuController
+                let secondVC = self.destinationViewController
+
+                var secondVCFrame: CGRect
+                var secondVCOriginX: CGFloat
+
+                if (self.identifier == FFLeftSegueIdentifier) {
+                    secondVCFrame = CGRectMake(CGFloat(0), CGFloat(0), firstVC.rightMenuWidh, screenHeight)
+                    secondVCOriginX = -firstVC.leftMenuWidh
+                } else {
+                    secondVCFrame = CGRectMake(screenWidth - firstVC.rightMenuWidh, CGFloat(0), firstVC.rightMenuWidh, screenHeight)
+                    secondVCOriginX = screenWidth
+                }
+
+                firstVC.addChildViewController(secondVC)
+                secondVC.view.frame = secondVCFrame
+                firstVC.view.addSubview(secondVC.view)
+                secondVC.didMoveToParentViewController(firstVC)
+
+                if (self.identifier == FFLeftSegueIdentifier) {
+                    firstVC.leftMenuView = secondVC.view
+                } else {
+                    firstVC.rightMenuView = secondVC.view
+                }
+
+                UIView.animateWithDuration(0, animations: { () -> Void in
+                    secondVC.view.frame.origin.x = secondVCOriginX
+                    }) { (Finished) -> Void in
+                        secondVC.view.layoutIfNeeded()
+                        secondVC.view.updateConstraintsIfNeeded()
+                }
+
+            default:
+                break
+        }
+    }
 }
 
+// MARK: - FFSideMenuController Class
 public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate {
 
     // MARK: - Variable
-
     public var screenWidth = UIScreen.mainScreen().bounds.width
     public var screenHeight = UIScreen.mainScreen().bounds.height
 
@@ -34,21 +80,16 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
     public var rightMenuWidh: CGFloat = 0.0
 
     // MARK: - View method
-
     override public func viewDidLoad() {
         super.viewDidLoad()
+
         // Do any additional setup after loading the view.
         leftMenuWidh = screenWidth / 5 * 4
         rightMenuWidh = screenWidth / 5 * 4
-    }
 
-    override public func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-
-        UIView.animateWithDuration(0, animations: {
-            self.leftMenuView?.frame.size.width = 0
-            self.rightMenuView?.frame.origin.x = self.screenWidth
-        })
+        self.performSegueWithIdentifier(FFLeftSegueIdentifier, sender: self)
+        self.performSegueWithIdentifier(FFRightSegueIdentifier, sender: self)
+        setupGestrue(true, enableTap: true)
     }
 
     override public func didReceiveMemoryWarning() {
@@ -57,83 +98,29 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
     }
 
     // MARK: - FFSideMenu core method
+    public func setupGestrue(enablePan: Bool, enableTap: Bool) {
+        if (enablePan) {
+            let panLeftMenu = UIPanGestureRecognizer(target: self, action: "panLeftMenu:")
+            panLeftMenu.delegate = self
+            leftMenuView!.addGestureRecognizer(panLeftMenu)
 
-    public func setupMenu(leftMenuViewController: UIViewController?,
-        rightMenuViewController: UIViewController?,
-        leftMenuWidh: CGFloat?,
-        rightMenuWidh: CGFloat?,
-        enableTap: Bool,
-        enablePan: Bool) {
-            var menuType: FFSideMenuType?
+            let panRightMenu = UIPanGestureRecognizer(target: self, action: "panRightMenu:")
+            panRightMenu.delegate = self
+            rightMenuView!.addGestureRecognizer(panRightMenu)
 
-            if (leftMenuViewController != nil && rightMenuViewController == nil) {
-                menuType = .Left
-            } else if (leftMenuViewController == nil && rightMenuViewController != nil) {
-                menuType = .Right
-            } else if (leftMenuViewController != nil && rightMenuViewController != nil) {
-                menuType = .Both
-            }
+            let panLeftScreen = UIScreenEdgePanGestureRecognizer(target: self, action: "panLeftScreen:")
+            panLeftScreen.edges = .Left
+            view.addGestureRecognizer(panLeftScreen)
 
-            if let mt = menuType {
-                switch mt {
-                case .Left:
-                    setupLeftMenu(leftMenuViewController!)
-                case .Right:
-                    setupRightmenu(rightMenuViewController!)
-                case .Both:
-                    setupLeftMenu(leftMenuViewController!)
-                    setupRightmenu(rightMenuViewController!)
-                }
-            }
+            let panRightScreen = UIScreenEdgePanGestureRecognizer(target: self, action: "panRightScreen:")
+            panRightScreen.edges = .Right
+            view.addGestureRecognizer(panRightScreen)
+        }
 
-            if let lw = leftMenuWidh {
-                self.leftMenuWidh = lw
-            }
-
-            if let rw = rightMenuWidh {
-                self.rightMenuWidh = rw
-            }
-
-            if (enablePan) {
-                let panLeftMenu = UIPanGestureRecognizer(target: self, action: "panLeftMenu:")
-                panLeftMenu.delegate = self
-                leftMenuView!.addGestureRecognizer(panLeftMenu)
-
-                let panRightMenu = UIPanGestureRecognizer(target: self, action: "panRightMenu:")
-                panRightMenu.delegate = self
-                rightMenuView!.addGestureRecognizer(panRightMenu)
-
-                let panLeftScreen = UIScreenEdgePanGestureRecognizer(target: self, action: "panLeftScreen:")
-                panLeftScreen.edges = .Left
-                view.addGestureRecognizer(panLeftScreen)
-
-                let panRightScreen = UIScreenEdgePanGestureRecognizer(target: self, action: "panRightScreen:")
-                panRightScreen.edges = .Right
-                view.addGestureRecognizer(panRightScreen)
-            }
-
-            if (enableTap) {
-                let tap = UITapGestureRecognizer(target: self, action: "tap:")
-                self.view.addGestureRecognizer(tap)
-            }
-    }
-
-    func setupLeftMenu(viewController: UIViewController?) {
-        self.addChildViewController(viewController!)
-        viewController!.view.frame = CGRectMake(CGFloat(0), CGFloat(0), leftMenuWidh, screenHeight)
-        self.view.addSubview(viewController!.view)
-        viewController?.didMoveToParentViewController(self)
-
-        leftMenuView = viewController?.view
-    }
-
-    func setupRightmenu(viewController: UIViewController?) {
-        self.addChildViewController(viewController!)
-        viewController!.view.frame = CGRectMake(screenWidth - rightMenuWidh, CGFloat(0), rightMenuWidh, screenHeight)
-        self.view.addSubview(viewController!.view)
-        viewController?.didMoveToParentViewController(self)
-
-        rightMenuView = viewController?.view
+        if (enableTap) {
+            let tap = UITapGestureRecognizer(target: self, action: "tap:")
+            self.view.addGestureRecognizer(tap)
+        }
     }
 
     public func toggleLeftMenu() {
@@ -145,18 +132,18 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
             return toggleRightMenu()
         }
 
-        isLeftMenuOpen = leftMenuView?.frame.size.width == 0 ? true : false
+        isLeftMenuOpen = leftMenuView?.frame.origin.x != -leftMenuWidh ? true : false
 
         if (isLeftMenuOpen) {
             UIView.animateWithDuration(leftMenuAnimationDuration, animations: {
-                leftMenuView?.frame.size.width = leftMenuWidh
-            })
-            isLeftMenuOpen = true
-        } else {
-            UIView.animateWithDuration(leftMenuAnimationDuration, animations: {
-                leftMenuView?.frame.size.width = 0
+                leftMenuView?.frame.origin.x = -leftMenuWidh
             })
             isLeftMenuOpen = false
+        } else {
+            UIView.animateWithDuration(leftMenuAnimationDuration, animations: {
+                leftMenuView?.frame.origin.x = 0
+            })
+            isLeftMenuOpen = true
         }
     }
 
@@ -185,7 +172,6 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
     }
 
     // MARK: - Gesture method
-
     func tap(gesture: UIGestureRecognizer) {
         if let tapGesture = gesture as? UITapGestureRecognizer {
             let dot = tapGesture.locationOfTouch(0, inView: self.view)
@@ -205,27 +191,27 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
             let translation = panGesture.translationInView(panGesture.view!)
 
             if (isLeftMenuOpen) {
-                let width = leftMenuWidh + translation.x
+                let originX = translation.x
 
-                if (width > 0 && width < leftMenuWidh) {
-                    panGesture.view!.frame.size.width = width
+                if (originX > -leftMenuWidh && originX <= 0) {
+                    panGesture.view!.frame.origin.x = originX
                 }
             }
 
             if (panGesture.state == UIGestureRecognizerState.Ended) {
                 let duration = leftMenuAnimationDuration / 2
 
-                if (panGesture.view!.frame.size.width < leftMenuWidh / 2) {
+                if (panGesture.view!.frame.origin.x > -self.leftMenuWidh / 2) {
                     UIView.animateWithDuration(duration, animations: { () -> Void in
-                        panGesture.view!.frame.size.width = 0
+                        panGesture.view!.frame.origin.x = 0
                         }, completion: { (Bool) -> Void in
-                            self.isLeftMenuOpen = false
+                            self.isLeftMenuOpen = true
                     })
                 } else {
                     UIView.animateWithDuration(duration, animations: { () -> Void in
-                        panGesture.view!.frame.size.width = self.leftMenuWidh
+                        panGesture.view!.frame.origin.x = -self.leftMenuWidh
                         }, completion: { (Bool) -> Void in
-                            self.isLeftMenuOpen = true
+                            self.isLeftMenuOpen = false
                     })
                 }
             }
@@ -269,27 +255,27 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
             let translation = panGesture.translationInView(panGesture.view!)
 
             if (!isLeftMenuOpen && !isRightMenuOpen) {
-                let width = translation.x
+                let originX = -leftMenuWidh + translation.x
 
-                if (width > 0 && width < leftMenuWidh) {
-                    leftMenuView?.frame.size.width = width
+                if (originX > -leftMenuWidh && originX < 0) {
+                    self.leftMenuView!.frame.origin.x = originX
                 }
             }
 
             if (panGesture.state == UIGestureRecognizerState.Ended) {
                 let duration = leftMenuAnimationDuration / 2
 
-                if (self.leftMenuView?.frame.size.width < leftMenuWidh / 2) {
+                if (self.leftMenuView!.frame.origin.x >  -self.leftMenuWidh / 2) {
                     UIView.animateWithDuration(duration, animations: { () -> Void in
-                        self.leftMenuView?.frame.size.width = 0
+                        self.leftMenuView!.frame.origin.x = 0
                         }, completion: { (Bool) -> Void in
-                            self.isLeftMenuOpen = false
+                            self.isLeftMenuOpen = true
                     })
                 } else {
                     UIView.animateWithDuration(duration, animations: { () -> Void in
-                        self.leftMenuView?.frame.size.width = self.leftMenuWidh
+                        self.leftMenuView!.frame.origin.x = -self.leftMenuWidh
                         }, completion: { (Bool) -> Void in
-                            self.isLeftMenuOpen = true
+                            self.isLeftMenuOpen = false
                     })
                 }
             }

@@ -25,12 +25,13 @@ class ViewController: FFSideMenuController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        setupMenu(  LeftMenuController(),
-                    rightMenuViewController: RightMenuController(),
-                    leftMenuWidh: nil,
-                    rightMenuWidh: nil,
-                    enableTap: true,
-                    enablePan: true)
+//        setupMenu(  LeftMenuController(),
+//                    rightMenuViewController: RightMenuController(),
+//                    leftMenuWidh: nil,
+//                    rightMenuWidh: nil,
+//                    enableTap: true,
+//                    enablePan: true)
+        self.view.backgroundColor = UIColor.yellowColor()
     }
 
     override func didReceiveMemoryWarning() {

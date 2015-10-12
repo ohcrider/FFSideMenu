@@ -110,24 +110,27 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
     }
 
     public func setupBackgroudView(belowSubview: UIView) {
-        let backgroundView = UIView()
-        backgroundView.frame = CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight)
 
-        backgroundView.backgroundColor = backgroundViewColor
+        if ((self.view!.viewWithTag(backgroundViewTag)) == nil) {
+            let backgroundView = UIView()
+            backgroundView.frame = CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight)
 
-        backgroundView.tag = backgroundViewTag
-        backgroundView.alpha = 0
+            backgroundView.backgroundColor = backgroundViewColor
 
-        self.view.insertSubview(backgroundView, belowSubview: belowSubview)
+            backgroundView.tag = backgroundViewTag
+            backgroundView.alpha = 0
 
-        UIView.animateWithDuration(backgroundAnimationDuration, animations: {
-                backgroundView.alpha = 1
-            }, completion: { (Bool) -> Void in
-        })
+            self.view.insertSubview(backgroundView, belowSubview: belowSubview)
 
-        if (enableTap) {
-            let tap = UITapGestureRecognizer(target: self, action: "tap:")
-            backgroundView.addGestureRecognizer(tap)
+            UIView.animateWithDuration(backgroundAnimationDuration, animations: {
+                    backgroundView.alpha = 1
+                }, completion: { (Bool) -> Void in
+            })
+
+            if (enableTap) {
+                let tap = UITapGestureRecognizer(target: self, action: "tap:")
+                backgroundView.addGestureRecognizer(tap)
+            }
         }
     }
 

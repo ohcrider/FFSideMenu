@@ -21,41 +21,41 @@ public class FFSideMenuSetMenuSegue: UIStoryboardSegue {
 
     override public func perform() {
         switch self.identifier {
-            case FFLeftSegueIdentifier?, FFRightSegueIdentifier?:
-                let firstVC = self.sourceViewController as! FFSideMenuController
-                let secondVC = self.destinationViewController
+        case FFLeftSegueIdentifier?, FFRightSegueIdentifier?:
+            let firstVC = self.sourceViewController as! FFSideMenuController
+            let secondVC = self.destinationViewController
 
-                var secondVCFrame: CGRect
-                var secondVCOriginX: CGFloat
+            var secondVCFrame: CGRect
+            var secondVCOriginX: CGFloat
 
-                if (self.identifier == FFLeftSegueIdentifier) {
-                    secondVCFrame = CGRectMake(CGFloat(0), CGFloat(0), firstVC.rightMenuWidh, screenHeight)
-                    secondVCOriginX = -firstVC.leftMenuWidh
-                } else {
-                    secondVCFrame = CGRectMake(screenWidth - firstVC.rightMenuWidh, CGFloat(0), firstVC.rightMenuWidh, screenHeight)
-                    secondVCOriginX = screenWidth
-                }
+            if (self.identifier == FFLeftSegueIdentifier) {
+                secondVCFrame = CGRectMake(CGFloat(0), CGFloat(0), firstVC.rightMenuWidh, screenHeight)
+                secondVCOriginX = -firstVC.leftMenuWidh
+            } else {
+                secondVCFrame = CGRectMake(screenWidth - firstVC.rightMenuWidh, CGFloat(0), firstVC.rightMenuWidh, screenHeight)
+                secondVCOriginX = screenWidth
+            }
 
-                firstVC.addChildViewController(secondVC)
-                secondVC.view.frame = secondVCFrame
-                firstVC.view.addSubview(secondVC.view)
-                secondVC.didMoveToParentViewController(firstVC)
+            firstVC.addChildViewController(secondVC)
+            secondVC.view.frame = secondVCFrame
+            firstVC.view.addSubview(secondVC.view)
+            secondVC.didMoveToParentViewController(firstVC)
 
-                if (self.identifier == FFLeftSegueIdentifier) {
-                    firstVC.leftMenuView = secondVC.view
-                } else {
-                    firstVC.rightMenuView = secondVC.view
-                }
+            if (self.identifier == FFLeftSegueIdentifier) {
+                firstVC.leftMenuView = secondVC.view
+            } else {
+                firstVC.rightMenuView = secondVC.view
+            }
 
-                UIView.animateWithDuration(0, animations: { () -> Void in
-                    secondVC.view.frame.origin.x = secondVCOriginX
-                    }) { (Finished) -> Void in
-                        secondVC.view.layoutIfNeeded()
-                        secondVC.view.updateConstraintsIfNeeded()
-                }
+            UIView.animateWithDuration(0, animations: { () -> Void in
+                secondVC.view.frame.origin.x = secondVCOriginX
+                }) { (Finished) -> Void in
+                    secondVC.view.layoutIfNeeded()
+                    secondVC.view.updateConstraintsIfNeeded()
+            }
 
-            default:
-                break
+        default:
+            break
         }
     }
 }
@@ -73,8 +73,24 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
     public var backgroundViewTag = 123456789
     public var backgroundViewColor: UIColor?
 
-    public var isLeftMenuOpen = false
-    public var isRightMenuOpen = false
+    public var isLeftMenuOpen = false {
+        didSet {
+            if (isLeftMenuOpen != false) {
+                leftMenuIsOpen()
+            } else {
+                leftMenuIsClose()
+            }
+        }
+    }
+    public var isRightMenuOpen = false {
+        didSet {
+            if (isRightMenuOpen != false) {
+                rightMenuIsOpen()
+            } else {
+                rightMenuIsClose()
+            }
+        }
+    }
 
     public var leftMenuAnimationDuration = 0.3
     public var rightMenuAnimationDuration = 0.3
@@ -123,7 +139,7 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
             self.view.insertSubview(backgroundView, belowSubview: belowSubview)
 
             UIView.animateWithDuration(backgroundAnimationDuration, animations: {
-                    backgroundView.alpha = 1
+                backgroundView.alpha = 1
                 }, completion: { (Bool) -> Void in
             })
 
@@ -142,7 +158,7 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
             self.isLeftMenuOpen = false
             if let bgView = self.view!.viewWithTag(backgroundViewTag) {
                 UIView.animateWithDuration(backgroundAnimationDuration, animations: {
-                        bgView.alpha = 0
+                    bgView.alpha = 0
                     }, completion: { (Bool) -> Void in
                         bgView.removeFromSuperview()
                 })
@@ -201,15 +217,15 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
         if (isLeftMenuOpen) {
             UIView.animateWithDuration(leftMenuAnimationDuration, animations: {
                 leftMenuView?.frame.origin.x = -leftMenuWidh
-            }, completion: { (Bool) -> Void in
-                self.setLeftMenuOpen(false)
+                }, completion: { (Bool) -> Void in
+                    self.setLeftMenuOpen(false)
             })
 
         } else {
             UIView.animateWithDuration(leftMenuAnimationDuration, animations: {
                 leftMenuView?.frame.origin.x = 0
-            }, completion: { (Bool) -> Void in
-                self.setLeftMenuOpen(true)
+                }, completion: { (Bool) -> Void in
+                    self.setLeftMenuOpen(true)
             })
 
         }
@@ -390,5 +406,18 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
     public func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
         let translation = (gestureRecognizer as! UIPanGestureRecognizer).translationInView(gestureRecognizer.view!.superview)
         return abs(translation.x) > abs(translation.y)
+    }
+    
+    // MARK: - Didset callback
+    public func leftMenuIsOpen() {
+    }
+    
+    public func leftMenuIsClose() {
+    }
+    
+    public func rightMenuIsOpen() {
+    }
+    
+    public func rightMenuIsClose() {
     }
 }

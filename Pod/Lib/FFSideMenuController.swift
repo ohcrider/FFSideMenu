@@ -216,14 +216,14 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
 
         if (isLeftMenuOpen) {
             UIView.animateWithDuration(leftMenuAnimationDuration, animations: {
-                leftMenuView?.frame.origin.x = -leftMenuWidh
+                self.leftMenuView?.frame.origin.self.x = -self.leftMenuWidh
                 }, completion: { (Bool) -> Void in
                     self.setLeftMenuOpen(false)
             })
 
         } else {
             UIView.animateWithDuration(leftMenuAnimationDuration, animations: {
-                leftMenuView?.frame.origin.x = 0
+                self.leftMenuView?.frame.origin.x = 0
                 }, completion: { (Bool) -> Void in
                     self.setLeftMenuOpen(true)
             })
@@ -244,14 +244,14 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
 
         if (isRightMenuOpen) {
             UIView.animateWithDuration(rightMenuAnimationDuration, animations: {
-                rightMenuView?.frame.origin.x = screenWidth - rightMenuWidh
+                self.rightMenuView?.frame.origin.x = self.screenWidth - self.rightMenuWidh
                 }, completion: { (Bool) -> Void in
                     self.setRightMenuOpen(true)
             })
 
         } else {
             UIView.animateWithDuration(rightMenuAnimationDuration, animations: {
-                rightMenuView?.frame.origin.x = screenWidth
+                self.rightMenuView?.frame.origin.x = self.screenWidth
                 }, completion: { (Bool) -> Void in
                     self.setRightMenuOpen(false)
             })

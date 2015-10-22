@@ -1,4 +1,4 @@
-platform :ios, '9.0'
+platform :ios, '9.1'
 use_frameworks!
 
 target 'FFSideMenu_Example', :exclusive => true do
@@ -8,5 +8,5 @@ end
 target 'FFSideMenu_Tests', :exclusive => true do
   pod "FFSideMenu", :path => "../"
 
-  pod 'FBSnapshotTestCase', :git => 'git@github.com:facebook/ios-snapshot-test-case.git', :branch => 'master'
+  # pod 'FBSnapshotTestCase', :git => 'git@github.com:facebook/ios-snapshot-test-case.git', :branch => 'master'
 end

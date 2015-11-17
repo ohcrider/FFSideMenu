@@ -114,10 +114,6 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
         enablePan = true
 
         backgroundViewColor = UIColor(red:0.09, green:0.09, blue:0.09, alpha:0.5)
-
-        self.performSegueWithIdentifier(FFLeftSegueIdentifier, sender: self)
-        self.performSegueWithIdentifier(FFRightSegueIdentifier, sender: self)
-        setupGestrue()
     }
 
     override public func didReceiveMemoryWarning() {
@@ -183,20 +179,26 @@ public class FFSideMenuController: UIViewController, UIGestureRecognizerDelegate
     }
 
     // MARK: - FFSideMenu core method
-    public func setupGestrue() {
+    
+    public func setUpLeftMenu() {
+        self.performSegueWithIdentifier(FFLeftSegueIdentifier, sender: self)
         if (enablePan) {
             let panLeftMenu = UIPanGestureRecognizer(target: self, action: "panLeftMenu:")
             panLeftMenu.delegate = self
             leftMenuView!.addGestureRecognizer(panLeftMenu)
-
-            let panRightMenu = UIPanGestureRecognizer(target: self, action: "panRightMenu:")
-            panRightMenu.delegate = self
-            rightMenuView!.addGestureRecognizer(panRightMenu)
-
+            
             let panLeftScreen = UIScreenEdgePanGestureRecognizer(target: self, action: "panLeftScreen:")
             panLeftScreen.edges = .Left
             view.addGestureRecognizer(panLeftScreen)
-
+        }
+    }
+    
+    public func setUpRightMenu() {
+        self.performSegueWithIdentifier(FFRightSegueIdentifier, sender: self)
+        if (enablePan) {
+            let panRightMenu = UIPanGestureRecognizer(target: self, action: "panRightMenu:")
+            panRightMenu.delegate = self
+            rightMenuView!.addGestureRecognizer(panRightMenu)
             let panRightScreen = UIScreenEdgePanGestureRecognizer(target: self, action: "panRightScreen:")
             panRightScreen.edges = .Right
             view.addGestureRecognizer(panRightScreen)
